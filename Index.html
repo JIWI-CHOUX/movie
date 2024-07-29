@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>내배캠 최고 평점 영화</title>
+
+    <style>
+        body {
+            background-color: black;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: url('https://i.pinimg.com/474x/69/65/48/6965481f7ab1ede015e8f8c3f0a0ea3a.jpg') no-repeat center center;
+            background-size: cover;
+            text-align: center;
+            padding: 200px 0;
+            position: relative;
+        }
+
+        header h1 {
+            position: relative;
+            font-size: 85px;
+            color: white;
+            margin: 0;
+            transition: transform 0.3s;
+        }
+
+        header h1:hover {
+            transform: scale(1.05);
+        }
+
+        .search {
+            position: relative; 
+            background-color: transparent; 
+            text-align: center;
+            color: white; 
+            padding: 15px 0; 
+            margin: 0 10px; 
+            height: 60px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+        }
+
+        .search input {
+            padding: 10px; 
+            border: none; 
+            border-radius: 5px; 
+            margin-left: 10px; 
+        }
+
+        .search button {
+            transition: transform 0.3s;
+            margin: 0 5px; 
+            padding: 10px 15px; 
+            border: none; 
+            border-radius: 5px;
+        }
+
+        .search button:hover {
+            transform: scale(1.05); 
+        }
+
+        .language-buttons {
+            position: absolute;
+            right: 10px; 
+            top: 50%; 
+            transform: translateY(-50%); 
+        }
+
+        .language-buttons button {
+            transition: transform 0.3s;
+            margin: 0 5px; 
+            padding: 10px 15px;
+            border-radius: 5px; 
+        }
+
+        .language-buttons button:hover {
+            transform: scale(1.05);
+        }
+
+
+        .col {
+            background: linear-gradient(to bottom, #D2B48C, #f0e6d2);
+            width: 23%; 
+            margin: 1%; 
+            box-sizing: border-box; 
+            transition: transform 0.3s; 
+            border-radius: 10px; 
+        }
+
+        .col img {
+            width: 100%; 
+            height: auto; 
+            border-top-left-radius: 10px; 
+            border-top-right-radius: 10px;
+        }
+
+        .col:hover {
+            transform: scale(1.05); 
+        }
+
+        #cards {
+            display: flex; 
+            flex-wrap: wrap; 
+            justify-content: center; 
+            padding: 10px; 
+            flex-grow: 1; 
+        }
+
+        .overview {
+            display: -webkit-box; 
+            -webkit-box-orient: vertical; 
+            -webkit-line-clamp: 3; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            max-height: 60px; 
+        }
+
+        .popup {
+            display: none; 
+            position: fixed; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            background-color: white; 
+            padding: 20px; 
+            border: 1px solid black;
+            z-index: 10; 
+            width: 80%; 
+            max-width: 500px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .popup img {
+            width: 100%; 
+            height: auto; 
+        }
+
+        .popup-content {
+            text-align: center; 
+            color: black; 
+        }
+
+        .popup-close {
+            background-color: black;
+            color: white;
+            border: none; 
+            padding: 5px 10px; 
+            cursor: pointer; 
+            margin-top: 10px; 
+            position: absolute; 
+            bottom: 10px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            transition: transform 0.3s; 
+        }
+
+        .popup-close:hover {
+            transform: scale(1.05) translateX(-50%); 
+        }
+
+        .overlay {
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px); 
+            z-index: 5; 
+        }
+
+        .floating-button {
+            position: fixed; 
+            right: 20px; 
+            top: 20px; 
+            background-color: white;
+            color: #000;
+            border-radius: 15px; 
+            width: 120px; 
+            height: 50px;
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            z-index: 15; 
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
+            transition: transform 0.3s; 
+        }
+
+        .floating-button:hover {
+            transform: scale(1.05);
+        }
+
+        .watched-movies-list {
+            display: none; 
+            position: fixed; 
+            right: 20px; 
+            top: 80px; 
+            background-color: rgba(255, 255, 255, 0.9); 
+            padding: 10px; 
+            z-index: 15; 
+            max-height: 400px; 
+            overflow-y: auto; 
+            backdrop-filter: blur(5px); 
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
+            border-radius: 15px; 
+        }
+
+        .watched-movie {
+            padding: 5px 0; 
+            display: flex; 
+            align-items: center; 
+        }
+
+        .watched-movie img {
+            width: 50px;
+            height: auto; 
+            margin-right: 10px; 
+        }
+
+        .watched-movie:hover {
+            background-color: grey;
+        }
+
+        .movie-info h3 {
+            margin: 10px 0 5px 0; 
+        }
+
+        footer {
+            margin-top: auto; 
+            padding: 10px; 
+        }
+    </style>
+    <script>
+        const options = {
+            method: 'GET',
+            headers: {
+                accept: 'application/json',
+                Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiYzBmYjU2OGFmMzM3MzI4NzUzNjcyNWY0NzFjMDEyYyIsIm5iZiI6MTcyMTg5MDIxMC4wMzQ3MzEsInN1YiI6IjY2YTFmM2JmNzdjOTVkMzQxODE0ZGFkYSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.3b65GUqPTNn_5qlaBJOWsCKXrnh99kVkyCzpP0pEWKE'
+            }
+        };
+
+        let watchedMovies = [];
+
+        function fetchMovies(language) {
+            fetch(`https://api.themoviedb.org/3/movie/top_rated?language=${language}&page=1`, options)
+                .then(response => response.json())
+                .then(response => {
+                    let movie_list = response.results;
+
+                    const displayMovies = movies => {
+                        let temp_html = '';
+                        movies.forEach(i => {
+                            let img_url = 'https://image.tmdb.org/t/p/w500' + i.backdrop_path;
+                            let movie_title = i.title;
+                            let overview = i.overview;
+                            let vote = i.vote_average;
+                            let id = i.id;
+
+                            temp_html += `
+                                <div class="col" data-id="${id}">
+                                    <div class="wrapBox btnOpenModal">
+                                        <img src='${img_url}' alt="">
+                                        <div class="info">
+                                            <div class="wrap">
+                                                <h3>${movie_title}</h3>
+                                                <p class="overview">${overview}</p>
+                                                <p>⭐ ${vote}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        });
+
+                        document.getElementById('cards').innerHTML = temp_html;
+
+                        document.querySelectorAll('.col').forEach(col => {
+                            col.addEventListener('click', function () {
+                                let movieId = this.getAttribute('data-id');
+                                alert(`영화 ID: ${movieId}`);
+                                let selectedMovie = movies.find(movie => movie.id == movieId);
+                                showPopup(selectedMovie);
+                                addWatchedMovie(selectedMovie);
+                            });
+                        });
+                    }
+
+                    displayMovies(movie_list);
+
+                    function searchMovies() {
+                        const movie_name_input = document.getElementById('movie_name_input').value.trim().toUpperCase();
+                        const filtered_movies = movie_list.filter(movie => movie.title.toUpperCase().includes(movie_name_input));
+
+                        if (filtered_movies.length === 0) {
+                            alert('검색 결과가 없습니다.');
+                            location.reload();
+                        } else {
+                            displayMovies(filtered_movies);
+                        }
+                    }
+
+                    document.getElementById('search_btn').onclick = searchMovies;
+
+                    document.getElementById('movie_name_input').addEventListener('keyup', function (event) {
+                        if (event.key === 'Enter') {
+                            searchMovies();
+                        }
+                    });
+
+                    document.getElementById('search_btn_bottom').onclick = searchMovies;
+
+                    document.getElementById('movie_name_input_bottom').addEventListener('keyup', function (event) {
+                        if (event.key === 'Enter') {
+                            searchMovies();
+                        }
+                    });
+                });
+        }
+
+        function showPopup(movie) {
+            const popup = document.getElementById('popup');
+            const overlay = document.getElementById('overlay');
+            popup.querySelector('.popup-content').innerHTML = `
+                <img src="https://image.tmdb.org/t/p/w500${movie.backdrop_path}" alt="${movie.title}">
+                <h2>${movie.title}</h2>
+                <p>${movie.overview}</p>
+                <p>⭐ ${movie.vote_average}</p>
+            `;
+            popup.style.display = 'block';
+            overlay.style.display = 'block';
+
+            document.addEventListener('keydown', function (event) {
+                if (event.key === 'Enter') {
+                    popup.style.display = 'none';
+                    overlay.style.display = 'none';
+                }
+            });
+
+            document.getElementById('popup-close').addEventListener('click', function () {
+                popup.style.display = 'none';
+                overlay.style.display = 'none';
+            });
+
+            document.getElementById('overlay').addEventListener('click', function () {
+                popup.style.display = 'none';
+                overlay.style.display = 'none';
+            });
+        }
+
+        function initialize() {
+            document.querySelector('header h1').addEventListener('click', () => {
+                location.reload();
+            });
+
+            document.getElementById('lang-ko').addEventListener('click', () => {
+                fetchMovies('ko-KR');
+            });
+
+            document.getElementById('lang-en').addEventListener('click', () => {
+                fetchMovies('en-US');
+            });
+
+            document.querySelector('.floating-button').addEventListener('click', function () {
+                const list = document.querySelector('.watched-movies-list');
+                const button = document.querySelector('.floating-button');
+                if (list.style.display === 'block') {
+                    list.style.display = 'none';
+                    button.innerHTML = '검색기록';
+                } else {
+                    list.style.display = 'block';
+                    button.innerHTML = '검색기록 닫기';
+                }
+            });
+
+            fetchMovies('ko-KR');
+        }
+
+        function addWatchedMovie(movie) {
+            if (!watchedMovies.some(watched => watched.id === movie.id)) {
+                watchedMovies.push(movie);
+                const listItem = document.createElement('div');
+                listItem.classList.add('watched-movie');
+                listItem.innerHTML = `<img src="https://image.tmdb.org/t/p/w200${movie.poster_path}" alt="${movie.title}"> ${movie.title}`;
+                listItem.dataset.id = movie.id;
+                listItem.addEventListener('click', function () {
+                    showPopup(movie);
+                });
+                document.querySelector('.watched-movies-list').appendChild(listItem);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', initialize);
+    </script>
+</head>
+
+<body>
+    <header>
+        <h1>내배캠 최고 평점 영화 컬렉션</h1>
+    </header>
+    <div class="search">
+        영화 검색: <input type="text" id="movie_name_input">
+        <button id="search_btn">검색</button>
+        <div class="language-buttons">
+            <button id="lang-ko" style="background-color: #D2B48C;">한국어</button>
+            <button id="lang-en" style="background-color: #D2B48C;">English</button>
+        </div>
+    </div>
+    <div id="cards"></div>
+
+    <div id="popup" class="popup">
+        <div class="popup-content"></div>
+        <button id="popup-close" class="popup-close">닫기</button>
+    </div>
+    <div id="overlay" class="overlay"></div>
+
+    <div class="floating-button" style="background-color: #D2B48C;">검색기록</div>
+    <div class="watched-movies-list"></div>
+
+    <footer>
+        <div class="search">
+            영화 검색: <input type="text" id="movie_name_input_bottom">
+            <button id="search_btn_bottom">검색</button>
+        </div>
+    </footer>
+</body>
+
+</html>
